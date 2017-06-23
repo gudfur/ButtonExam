@@ -66,8 +66,8 @@ public class MainActivity extends Activity {
     int dr[] = {0, -1, 0, 1}, dc[] = {1, 0, -1, 0};//각각 direction=0,1,2,3 = 오른쪽 위 왼쪽 아래
     int cc[][] = new int[4][2];//임시 배열
     int corner[][]=new int [4][2];
-    int[] glo;
 
+    int mapnum;
     char map[][];
     char mapset[][][]=
             {{"000000000000".toCharArray(),
@@ -84,17 +84,17 @@ public class MainActivity extends Activity {
              "000000000000".toCharArray(),},
 
              {"000000000000".toCharArray(),
-              "011111111110".toCharArray(),
-              "010000000010".toCharArray(),
-              "011111111110".toCharArray(),
-              "000000000000".toCharArray(),
-              "001111111100".toCharArray(),
-              "001111111100".toCharArray(),
-              "000000000000".toCharArray(),
-              "011111111110".toCharArray(),
-              "010000000010".toCharArray(),
-              "011111111110".toCharArray(),
-              "000000000000".toCharArray()},
+             "001111111100".toCharArray(),
+             "010100000110".toCharArray(),
+             "010110001110".toCharArray(),
+             "010001011010".toCharArray(),
+             "010011111010".toCharArray(),
+             "010111100010".toCharArray(),
+             "010001111010".toCharArray(),
+             "010010010110".toCharArray(),
+             "010100101010".toCharArray(),
+             "001111111100".toCharArray(),
+             "000000000000".toCharArray(),},
 
              {"000000000000".toCharArray(),
               "000100010000".toCharArray(),
@@ -102,15 +102,13 @@ public class MainActivity extends Activity {
               "011001111100".toCharArray(),
               "011100001100".toCharArray(),
               "011100000110".toCharArray(),
-              "011110000010".toCharArray(),
-              "001100001000".toCharArray(),
+              "001110000010".toCharArray(),
+              "000100001000".toCharArray(),
               "000000011100".toCharArray(),
-              "001101111100".toCharArray(),
-              "000011111000".toCharArray(),
-              "000001110000".toCharArray(),
+              "001001111100".toCharArray(),
+              "000111111000".toCharArray(),
               "000000000000".toCharArray()}};
 
-    TextView t,te;
 
     public void dfs(int sr, int sc, int er, int ec, int ccnt, int direction, int count) // ccnt=꺾이는 횟수 카운트 direction=방향 count=거리
             //map 배열이 1~10까지 세기때문에 1칸 늘려서 셈
@@ -134,7 +132,7 @@ public class MainActivity extends Activity {
             return;
         }
         for (int i = 0; i < 4; i++) {
-            if (sr + dr[i] < 0 || sr + dr[i] >= N+1 || sc + dc[i] < 0 || sc + dc[i] >= N+1 || (!(sr+dr[i]==er && sc+dc[i]==ec) && map[sr+dr[i]][sc+dc[i]]=='1'))
+            if (sr + dr[i] < 0 || sr + dr[i] > N+1 || sc + dc[i] < 0 || sc + dc[i] > N+1 || (!(sr+dr[i]==er && sc+dc[i]==ec) && map[sr+dr[i]][sc+dc[i]]=='1'))
                 continue; //칸 빠져나감
             if (i != direction) //방향이 바뀜
             {
@@ -173,13 +171,12 @@ public class MainActivity extends Activity {
                 dfs(first_row+1,first_col+1,row+1,col+1,0,-1,0);
                 if(l.cc !=N)
                 {
-                    te.setText("");
                     mCheck=true;
                     int [] location=new int [2];
                     btn[corner[0][0]][corner[0][1]].getLocationInWindow(location);
 
                     l.pos[0][0]=(float)(location[0]+32.5);
-                    l.pos[0][1]=(float)(location[1]-172+42.5+4.5); //x,y값 0으로 받아오는
+                    l.pos[0][1]=(float)(location[1]); //x,y값 0으로 받아오는
 
                     //코너 처리
                     for(int ii=1;ii<=l.cc;ii++)
@@ -188,12 +185,6 @@ public class MainActivity extends Activity {
                         l.pos[ii][1]=(float)(l.pos[ii-1][1]+(85*(corner[ii][0]-corner[ii-1][0]))); //corner는 row-col식이고 좌표는 x-y식이다
                     }
 
-                    /*btn[corner[l.cc][0]][corner[l.cc][1]].getLocationInWindow(location);
-                    l.pos[l.cc][0]=(float)(location[0]+32.5);
-                    l.pos[l.cc][1]=(float)(location[1]-172+42.5);*/
-
-                    te.setText(" ("+l.pos[0][0]+","+l.pos[0][1]+")("+l.pos[1][0]+","+l.pos[1][1]+")("+l.pos[2][0]+","+l.pos[2][1]+")("+l.pos[3][0]+","+l.pos[3][1]+")\n"+
-                    "("+corner[0][0]+","+corner[0][1]+")("+corner[1][0]+","+corner[1][1]+")("+corner[2][0]+","+corner[2][1]+")("+corner[3][0]+","+corner[3][1]+")");
                     l.invalidate();
                 }
             }
@@ -272,11 +263,9 @@ public class MainActivity extends Activity {
             toast.show();
             //gameover();
         }
-
-        t.setText(Integer.toString(alive));
     }
     public void buttonCreate(LinearLayout button_layout, GridLayout grid) {
-        int pair = 15;
+        int pair = alive/4;
         int check[] = new int[pair]; //pair*4짝
         button_layout.removeView(grid); //레이아웃 초기화
         grid.removeAllViews();   //버튼(들어있는 레이아웃) 초기화
@@ -293,7 +282,7 @@ public class MainActivity extends Activity {
                 btn[i][j] = new Button(MainActivity.this);
                 if(map[i+1][j+1]=='0') continue;
                 for (; ; ) {
-                    int rand = random.nextInt(pair); //0~3 랜덤
+                    int rand = random.nextInt(pair); //랜덤
                     if (check[rand] < 4) {
                         check[rand]++;
                         btn[i][j].setText(Integer.toString(rand + 1));
@@ -339,14 +328,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Random random = new Random();
+        int mapnum = random.nextInt(3); //0~2랜덤
+        alive=map_alive[mapnum];
+
         //map
         map=new char [N+2][N+2];
         for(int i=0;i<N+2;i++)
             for(int j=0;j<N+2;j++)
-                map[i][j]= mapset[0][i][j];
+                map[i][j]= mapset[mapnum][i][j];
 
         //map 배열 0(공간), 1~10(유효버튼), 11(공간)
-        alive=map_alive[0];
+        alive=map_alive[mapnum];
 
         final LinearLayout layout = (LinearLayout) findViewById(R.id.layout); //전체 레이아웃
 
@@ -362,61 +355,25 @@ public class MainActivity extends Activity {
         reset.setText("RESET");
         pl.addView(reset);
 
-        Button undo = new Button(this);
-        undo.setText("UNDO");
-        //pl.addView(undo);
-
-        t=new TextView(this);
-        t.setText(Integer.toString(alive));
-        pl.addView(t);
-
-        te=new TextView(this);
-        te.setText("");
-        te.setTextSize(7);
-        pl.addView(te);
-
         layout.addView(pl);
 
+        final int mapnum2=mapnum;
         reset.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v)
             {
                  map=new char [N+2][N+2];
                  for(int i=0;i<N+2;i++)
                      for(int j=0;j<N+2;j++)
-                         map[i][j]= mapset[0][i][j];
+                         map[i][j]= mapset[mapnum2][i][j];
 
                 for(int i=0;i<N;i++)
                     for(int j=0;j<N;j++) {
                         if (map[i + 1][j + 1] == '0') continue;
                         btn[i][j].setVisibility(Button.VISIBLE);
                     }
-                 alive=map_alive[0];
+                 alive=map_alive[mapnum2];
             }
         });
-        undo.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v)
-            {
-                //undo;
-            }
-        });
-
-
-        /*final TextView debugView=new TextView(this);
-
-        pl.addView(debugView);
-        layout.addView(pl);
-
-
-
-        ok.setOnClickListener(
-                new View.OnClickListener(){
-                    public void onClick(View v)
-                    {
-                        buttonCreate(layout,g); //전체 레이아웃, 레이아웃, 행,열
-                        layout.addView(g);
-                    }
-                });
-        */
 
         buttonCreate(layout, g);
         layout.addView(g);

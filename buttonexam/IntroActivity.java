@@ -12,12 +12,14 @@ import android.widget.TextView;
 
 public class IntroActivity extends Activity {
 
-    protected void OnCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.intro_main);
 
-        TextView l=(TextView) findViewById(R.id.textView);
-        l.setOnClickListener(new View.OnClickListener(){
+        TextView t=(TextView) findViewById(R.id.textView);
+        t.setTextSize(20);
+        t.setText("TOUCH");
+        t.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v)
             {
                 Intent intent=new Intent(getApplicationContext(),MainActivity.class);
